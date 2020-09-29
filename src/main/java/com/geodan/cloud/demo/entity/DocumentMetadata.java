@@ -1,6 +1,8 @@
 package com.geodan.cloud.demo.entity;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
 import javax.persistence.*;
@@ -18,7 +20,8 @@ public class DocumentMetadata {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @JsonIgnore
-    Long id;
+    @Column(name = "id")
+    Long internalId;
 
     @JsonIgnore
     String organisationId;
@@ -28,6 +31,8 @@ public class DocumentMetadata {
     Api api;
 
     @NotEmpty
+    @JsonProperty("id")
+    @JsonAlias("name")
     String name;
 
     @Data

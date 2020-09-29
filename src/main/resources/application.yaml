@@ -23,3 +23,8 @@ server:
     encoding:
       force: true
 
+logging:
+  level:
+    root: info
+    com.geodan.cloud: debug
+    org.hibernate.SQL: debug

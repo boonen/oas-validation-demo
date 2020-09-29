@@ -8,6 +8,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.handler.SimpleUrlHandlerMapping;
 import org.springframework.web.servlet.resource.ResourceHttpRequestHandler;
 import org.zalando.problem.ProblemModule;
@@ -15,6 +18,8 @@ import org.zalando.problem.violations.ConstraintViolationProblemModule;
 
 import java.util.Collections;
 import java.util.List;
+
+import static com.geodan.cloud.demo.spring.CollectionResourceSizeAdvice.X_TOTAL_COUNT;
 
 @SpringBootApplication
 public class OasValidationDemoApplication {
@@ -47,6 +52,20 @@ public class OasValidationDemoApplication {
             requestHandler.setLocations(locations);
             return requestHandler;
         }
+    }
+
+    @Bean
+    public WebMvcConfigurer corsConfigurer() {
+        return new WebMvcConfigurer() {
+            @Override
+            public void addCorsMappings(CorsRegistry registry) {
+                registry.addMapping("/api/**")
+                        .allowedOrigins("http://localhost:3000")
+                        .allowedHeaders(HttpHeaders.CONTENT_TYPE)
+                        .allowedMethods("*")
+                        .exposedHeaders(X_TOTAL_COUNT);
+            }
+        };
     }
 
     public static void main(String[] args) {
