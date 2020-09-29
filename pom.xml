@@ -177,28 +177,6 @@
                     </execution>
                 </executions>
             </plugin>
-            <plugin>
-                <groupId>com.devskiller.jpa2ddl</groupId>
-                <artifactId>jpa2ddl-maven-plugin</artifactId>
-                <version>0.9.12</version>
-                <extensions>true</extensions> <!-- required to run automatically -->
-                <configuration>
-                    <outputPath>${basedir}/src/main/resources/schema.sql</outputPath>
-                    <packages>
-                        <package>com.geodan.cloud.demo.entity</package>
-                    </packages>
-                    <jpaProperties>
-                        <property>
-                            <name>hibernate.dialect</name>
-                            <value>org.hibernate.dialect.H2Dialect</value>
-                        </property>
-                    </jpaProperties>
-                    <formatOutput>true</formatOutput>
-                    <skipSequences>true</skipSequences>
-                    <delimiter>;</delimiter>
-                    <action>DROP_AND_CREATE</action>
-                </configuration>
-            </plugin>            
         </plugins>
     </build>
 
