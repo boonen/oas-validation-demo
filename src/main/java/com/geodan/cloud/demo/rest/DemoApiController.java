@@ -20,11 +20,11 @@ import java.util.*;
 @RequestMapping(value = "/demo", produces = {MediaType.APPLICATION_JSON_VALUE, "application/geo+json"})
 public class DemoApiController {
 
-    private Map<String, Map<String, Location>> locations = new HashMap<>();
+    private final Map<String, Map<String, Location>> locations = new HashMap<>();
 
-    private ObjectMapper objectMapper;
+    private final ObjectMapper objectMapper;
 
-    private OpenApiProvider openApiProvider;
+    private final OpenApiProvider openApiProvider;
 
     public DemoApiController(ObjectMapper objectMapper, OpenApiProvider openApiProvider) {
         this.objectMapper = objectMapper;
@@ -34,9 +34,8 @@ public class DemoApiController {
     @GetMapping("/{customerId}/locations")
     public FeatureCollection<Location> getAll(@PathVariable String customerId) {
         Collection<Location> locations = getCustomerLocations(customerId);
-        FeatureCollection<Location> featureCollection = FeatureCollection.<Location>builder()
+        return FeatureCollection.<Location>builder()
                 .features(locations).build();
-        return featureCollection;
     }
 
     @PostMapping("/{customerId}/locations")

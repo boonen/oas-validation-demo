@@ -1,13 +1,14 @@
 package com.geodan.cloud.demo.service;
 
 import com.atlassian.oai.validator.report.ValidationReport;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 class OpenApiProviderTest {
 
-    private OpenApiProvider openApiProvider = new OpenApiProvider();
+    private final OpenApiProvider openApiProvider = new OpenApiProvider(new ObjectMapper());
 
     @Test
     void validate() {

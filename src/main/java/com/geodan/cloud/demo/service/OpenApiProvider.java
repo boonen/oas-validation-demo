@@ -4,6 +4,8 @@ import com.atlassian.oai.validator.report.LevelResolver;
 import com.atlassian.oai.validator.report.MessageResolver;
 import com.atlassian.oai.validator.report.ValidationReport;
 import com.atlassian.oai.validator.schema.SchemaValidator;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.parser.OpenAPIParser;
 import io.swagger.v3.parser.core.models.ParseOptions;
 import io.swagger.v3.parser.core.models.SwaggerParseResult;
@@ -24,6 +26,8 @@ public class OpenApiProvider {
 
     private final String defaultApi = "locations";
 
+    final ObjectMapper objectMapper;
+
     final MessageResolver messageResolver;
 
     final OpenAPIParser openAPIParser = new OpenAPIParser();
@@ -32,7 +36,8 @@ public class OpenApiProvider {
 
     final ParseOptions parseOptions = new ParseOptions();
 
-    public OpenApiProvider() {
+    public OpenApiProvider(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
         parseOptions.setResolve(true);
         parseOptions.setResolveCombinators(true);
         LevelResolver levelResolver = LevelResolver.create()
@@ -42,12 +47,20 @@ public class OpenApiProvider {
         messageResolver = new MessageResolver(levelResolver);
     }
 
+    public ValidationReport validate(Object json, String apiName, String typeName) {
+        try {
+            return validate(objectMapper.writeValueAsString(json), apiName, typeName);
+        } catch (JsonProcessingException e) {
+            log.warn("Could not convert object of type {} to JSON.", json.getClass().getName(), e);
+            throw new IllegalArgumentException("Input is invalid.");
+        }
+    }
+
     public ValidationReport validate(String json, String apiName, String typeName) {
         SwaggerParseResult apiDefinition = getSchemaValidator(apiName);
         SchemaValidator validator = new SchemaValidator(apiDefinition.getOpenAPI(), messageResolver);
 
-        ValidationReport validationReport = validator.validate(json, apiDefinition.getOpenAPI().getComponents().getSchemas().get(typeName), typeName);
-        return validationReport;
+        return validator.validate(json, apiDefinition.getOpenAPI().getComponents().getSchemas().get(typeName), typeName);
     }
 
     private static String readApiDefinition(String apiName) {
@@ -56,10 +69,10 @@ public class OpenApiProvider {
             BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(apiDefinition)));
             return reader.lines().collect(Collectors.joining(System.lineSeparator()));
         } catch (FileNotFoundException e) {
-            throw new RuntimeException(String.format("Resource 'classpath:static/apis/%s.yaml\' not found.", apiName));
+            throw new RuntimeException(String.format("Resource 'classpath:static/apis/%s.yaml' not found.", apiName));
         }
     }
-    
+
     private SwaggerParseResult getSchemaValidator(String apiName) {
         SwaggerParseResult apiDefinition;
         if (apiDefinitions.containsKey(apiName)) {

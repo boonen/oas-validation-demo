@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import javax.persistence.*;
+import javax.validation.Valid;
+import javax.validation.constraints.NotEmpty;
 
 @Data
 @Builder
@@ -22,8 +24,10 @@ public class DocumentMetadata {
     String organisationId;
 
     @Embedded
+    @Valid
     Api api;
 
+    @NotEmpty
     String name;
 
     @Data
@@ -34,6 +38,7 @@ public class DocumentMetadata {
     public static class Api {
 
         @Column(name = "api_name")
+        @NotEmpty
         private String name;
 
         @Column(name = "api_version")

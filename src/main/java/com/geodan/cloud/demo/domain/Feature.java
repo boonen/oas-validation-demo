@@ -2,7 +2,6 @@ package com.geodan.cloud.demo.domain;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
@@ -21,7 +20,7 @@ public class Feature {
 
     private double[] bbox;
 
-    @JsonInclude(JsonInclude.Include.ALWAYS)
+    @JsonInclude()
     private Object geometry;
 
     private Map<String, Object> properties;

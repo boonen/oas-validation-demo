@@ -1,7 +1,6 @@
 package com.geodan.cloud.demo;
 
 import com.bedatadriven.jackson.datatype.jts.JtsModule;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilderCustomizer;
@@ -9,13 +8,11 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
-import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.web.servlet.handler.SimpleUrlHandlerMapping;
 import org.springframework.web.servlet.resource.ResourceHttpRequestHandler;
 import org.zalando.problem.ProblemModule;
 import org.zalando.problem.violations.ConstraintViolationProblemModule;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -31,7 +28,7 @@ public class OasValidationDemoApplication {
     }
 
     @Configuration
-    public class FaviconConfiguration {
+    public static class FaviconConfiguration {
 
         @Bean
         public SimpleUrlHandlerMapping customFaviconHandlerMapping() {
@@ -46,7 +43,7 @@ public class OasValidationDemoApplication {
         protected ResourceHttpRequestHandler faviconRequestHandler() {
             ResourceHttpRequestHandler requestHandler = new ResourceHttpRequestHandler();
             ClassPathResource classPathResource = new ClassPathResource("static/");
-            List<Resource> locations = Arrays.asList(classPathResource);
+            List<Resource> locations = Collections.singletonList(classPathResource);
             requestHandler.setLocations(locations);
             return requestHandler;
         }

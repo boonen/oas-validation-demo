@@ -2,12 +2,16 @@ package com.geodan.cloud.demo.service;
 
 import com.geodan.cloud.demo.entity.DocumentMetadata;
 import com.geodan.cloud.demo.jpa.DocumentMetadataRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
+@Slf4j
 @Service
 public class DocumentService {
-    
-    private DocumentMetadataRepository documentMetadataRepository;
+
+    private final DocumentMetadataRepository documentMetadataRepository;
 
     public DocumentService(DocumentMetadataRepository documentMetadataRepository) {
         this.documentMetadataRepository = documentMetadataRepository;
@@ -16,5 +20,20 @@ public class DocumentService {
     public DocumentMetadata getDocument(String organisationId, String apiName, String name) {
         return documentMetadataRepository.findByOrganisationIdAndApiNameAndName(organisationId, apiName, name);
     }
-    
+
+    public List<DocumentMetadata> getDocuments(String organisationId, String apiName) {
+        return documentMetadataRepository.findByOrganisationIdAndApiName(organisationId, apiName);
+    }
+
+    public DocumentMetadata save(DocumentMetadata documentMetadata) {
+        return documentMetadataRepository.save(documentMetadata);
+    }
+
+    public void delete(String organisationId, String apiName, String name) {
+        DocumentMetadata document = getDocument(organisationId, apiName, name);
+        if (document != null) {
+            documentMetadataRepository.delete(document);
+        }
+        log.info("Successfully deleted Document /{}/{}/{}.", organisationId, apiName, name);
+    }
 }
