@@ -1,0 +1,1 @@
+insert into document_metadata values (default, 'locations', '1.0.0', 'test', 'customer1');

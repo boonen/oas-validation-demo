@@ -1,0 +1,305 @@
+openapi: 3.0.0
+info:
+  version: 1.0.0
+  title: Demo API
+  description: >-
+    A Demo API that is used to test dynamic validation using the JSR-303 spec and OAS
+    definitions. The API includes GeoJSON objects to test complex payloads.
+paths:
+  '/demo/{customer}/locations':
+    get:
+      description: Get all Locations of the specified Customer.
+      tags:
+        - Locations
+      parameters:
+        - $ref: '#/components/parameters/Customer'
+      responses:
+        '200':
+          description: A summary of all available Locations.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LocationSummaryCollection'
+            application/geo+json:
+              schema:
+                $ref: '#/components/schemas/LocationSummaryCollection'
+    post:
+      description: Create a new Location for the specified Customer.
+      tags:
+        - Locations
+      parameters:
+        - $ref: '#/components/parameters/Customer'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Location'
+          application/geo+json:
+            schema:
+              $ref: '#/components/schemas/Location'
+        description: New Location to be added.
+        required: true
+      responses:
+        '204':
+          description: New Location was successfully added.
+  '/demo/{customer}/locations/{locationId}':
+    get:
+      description: Get the Location with ID `locationId` of the specified Customer.
+      tags:
+        - Locations
+      parameters:
+        - $ref: '#/components/parameters/Customer'
+        - $ref: '#/components/parameters/LocationId'
+      responses:
+        '200':
+          description: A Locations
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Location'
+            application/geo+json:
+              schema:
+                $ref: '#/components/schemas/Location'
+    put:
+      description: Update the Location with ID `locationId` of the specified Customer.
+      tags:
+        - Locations
+      parameters:
+        - $ref: '#/components/parameters/Customer'
+        - $ref: '#/components/parameters/LocationId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Location'
+          application/geo+json:
+            schema:
+              $ref: '#/components/schemas/Location'
+        description: Location to be updated.
+        required: true
+      responses:
+        '200':
+          description: A Locations
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Location'
+            application/geo+json:
+              schema:
+                $ref: '#/components/schemas/Location'
+    delete:
+      description: Delete the Location with ID `locationId` of the specified Customer.
+      tags:
+        - Locations
+      parameters:
+        - $ref: '#/components/parameters/Customer'
+        - $ref: '#/components/parameters/LocationId'
+      responses:
+        '204':
+          description: A Locations
+components:
+  parameters:
+    Customer:
+      name: customer
+      in: path
+      required: true
+      schema:
+        $ref: '#/components/schemas/CustomerId'
+    LocationId:
+      name: locationId
+      in: path
+      required: true
+      schema:
+        $ref: '#/components/schemas/LocationId'
+  schemas:
+    CustomerId:
+      type: string
+      description: Unique identifier of a Customer
+      example: customer1234
+    LocationId:
+      description: Unique identifier of a Location
+      externalDocs:
+        url: 'https://www.itu.int/en/ITU-T/asn1/Pages/UUID/uuids.aspx'
+      type: string
+      format: uuid
+      example: '123e4567-e89b-12d3-a456-426614174000'
+    LocationSummaryCollection:
+      description: >-
+        A GeoJSON FeatureCollection that contains a summary of Locations.
+      externalDocs:
+        url: 'https://tools.ietf.org/html/rfc7946'
+      allOf:
+        - $ref: '#/components/schemas/GeoJsonFeatureCollection'
+      properties:
+        timeStamp:
+          type: string
+          format: dateTime
+        numberMatched:
+          type: integer
+          minimum: 0
+        numberReturned:
+          type: integer
+          minimum: 0
+        features:
+          type: array
+          items:
+            $ref: '#/components/schemas/LocationSummary'
+      required:
+        - features
+        - type
+    LocationSummary:
+      description: Summary of a Location (without GeoJSON Geometry)
+      externalDocs:
+        url: 'https://tools.ietf.org/html/rfc7946'
+      allOf:
+        - $ref: '#/components/schemas/Location'
+    Location:
+      description: TODO
+      externalDocs:
+        url: 'https://tools.ietf.org/html/rfc7946'
+      allOf:
+        - $ref: '#/components/schemas/GeoJsonFeature'
+        - properties:
+            id:
+              type: string
+              description: Identifier that defines the unique ID of the Location.
+      required:
+        - id
+        - properties
+    GeoJsonFeatureCollection:
+      description: "Object that holds an array of geographic objects."
+      externalDocs:
+        url: https://tools.ietf.org/html/rfc7946
+      properties:
+        type:
+          type: string
+          default: FeatureCollection
+          enum:
+            - FeatureCollection
+        features:
+          type: array
+          items:
+            $ref: "#/components/schemas/GeoJsonFeature"
+        bbox:
+          $ref: '#/components/schemas/Bbox'
+      required:
+        - type
+        - features
+    GeoJsonFeature:
+      description: "Object that holds a geographic object."
+      externalDocs:
+        url: https://tools.ietf.org/html/rfc7946
+      properties:
+        type:
+          type: string
+          default: Feature
+          enum:
+            - Feature
+        geometry:
+          oneOf:
+            - $ref: '#/components/schemas/GeoJsonGeometry'
+            - type: null
+        properties:
+          type: object
+          nullable: true
+          additionalProperties:
+            type: string
+        id:
+          description: Unique identifier of the `Feature`.
+          oneOf:
+            - type: string
+            - type: integer
+        bbox:
+          $ref: '#/components/schemas/Bbox'
+      required:
+        - type
+        - geometry
+        - properties
+    GeoJsonGeometry:
+      type: object
+      nullable: true
+      discriminator:
+        propertyName: type
+        mapping:
+          Point: '#/components/schemas/GeoJsonCoordinateArray1d'
+          LineString: '#/components/schemas/GeoJsonCoordinateArray2d'
+          Polygon: '#/components/schemas/GeoJsonCoordinateArray3d'
+          MultiPoint: '#/components/schemas/GeoJsonCoordinateArray2d'
+          MultiLineString: '#/components/schemas/GeoJsonCoordinateArray3d'
+          MultiPolygonString: '#/components/schemas/GeoJsonCoordinateArray4d'
+      oneOf:
+        - $ref: '#/components/schemas/GeoJsonCoordinateArray1d'
+        - $ref: '#/components/schemas/GeoJsonCoordinateArray2d'
+        - $ref: '#/components/schemas/GeoJsonCoordinateArray3d'
+        - $ref: '#/components/schemas/GeoJsonCoordinateArray4d'
+      properties:
+        type:
+          type: string
+          enum:
+            - Point
+            - LineString
+            - Polygon
+            - MultiPoint
+            - MultiLineString
+            - MultiPolygon
+      required:
+        - type
+        - coordinates
+    GeoJsonCoordinate:
+      type: array
+      maxItems: 3
+      minItems: 2
+      items:
+        type: number
+        format: double
+    GeoJsonCoordinateArray1d:
+      type: object
+      description: "GeoJSON 1-dimensional coordinate array (for Point geometries)."
+      properties:
+        coordinates:
+          $ref: '#/components/schemas/GeoJsonCoordinate'
+    GeoJsonCoordinateArray2d:
+      type: object
+      description: "GeoJSON 2-dimensional coordinate array (for LineString and MultiPoint geometries)."
+      properties:
+        coordinates:
+          type: array
+          items:
+            $ref: '#/components/schemas/GeoJsonCoordinate'
+    GeoJsonCoordinateArray3d:
+      type: object
+      description: "GeoJSON 3-dimensional coordinate array (for Polygon and MultiLineString geometries)."
+      properties:
+        coordinates:
+          type: array
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/GeoJsonCoordinate'
+    GeoJsonCoordinateArray4d:
+      type: object
+      description: "GeoJSON 4-dimensional coordinate array (for MultiLinePolygon geometries)."
+      properties:
+        coordinates:
+          type: array
+          items:
+            type: array
+            items:
+              type: array
+              items:
+                $ref: '#/components/schemas/GeoJsonCoordinate'
+    Bbox:
+      type: array
+      description: |
+        The bounding box that covers all coordinates of the GeoJSON object (in the WGS84 Coordinate
+        Reference System).
+
+        The ordinates of the BBOX must be in the following order: `minLon`,
+        `minLat`, `maxLon`, `maxLat`.
+      externalDocs:
+        url: https://tools.ietf.org/html/rfc7946#section-5
+      minLength: 4
+      maxLength: 6
+      items:
+        type: number
+        format: double
