@@ -5,6 +5,7 @@ application with REST API for managing Documents with JSON data and a Single Pag
 for the REST API. This setup simulises a much encountered scenario. 
 
 [![Build Status](https://travis-ci.org/boonen/oas-validation-demo.svg?branch=master)](https://travis-ci.org/boonen/oas-validation-demo)
+[![Docker Repository][dockerhub-shield]][dockerhub-url]
 [![Forks][forks-shield]][forks-url]
 [![Stargazers][stars-shield]][stars-url]
 [![Issues][issues-shield]][issues-url]
@@ -31,8 +32,12 @@ To run the project you need:
 
 It's easiest to run the application using Docker. 
 
-> We're working on hosting a public Docker image. Until it arrives you have to build it yourself using 
-> [Maven 3](https://maven.apache.org).
+1. Run using Docker
+```sh
+docker run --name oas-validation-demo -d -p 8080:8080 boonen/oas-validation-demo:latest
+```
+
+### Building from source
 
 1. Clone the repo
 ```sh
@@ -41,10 +46,6 @@ git clone https://github.com/boonen/oas-validation-demo.git
 2. Build using maven
 ```sh
 mvn spring-boot:build-image
-```
-3. Run using Docker
-```sh
-docker run --name oas-validation-demo -d -p 8080:8080 boonen/oas-validation-demo:latest
 ```
 
 ## Usage
@@ -100,3 +101,5 @@ Project Link: [https://github.com/boonen/oas-validation-demo](https://github.com
 [linkedin-url]: https://linkedin.com/in/boonen
 [twitter-shield]: https://img.shields.io/badge/-Twitter-blue.svg?style=flat-square&logo=twitter&colorB=555
 [twitter-url]: https://twitter.com/boonen
+[dockerhub-shield]: https://img.shields.io/badge/-Docker-blue.svg?style=flat-square&logo=docker&colorB=555
+[dockerhub-url]: https://hub.docker.com/r/boonen/oas-validation-demo
